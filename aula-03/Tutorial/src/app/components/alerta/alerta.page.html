@@ -1,0 +1,14 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button auto-hide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Alertas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-button (click)="exibir()" expand="block"  color="success">Alerta padrão</ion-button>
+  <ion-button (click)="exibirCustom()"  expand="block"  color="dark">Alerta customizado</ion-button>
+  <ion-button (click)="exibirComplete()" expand="block" fill="outline"  color="tertiary">Alerta Completo</ion-button>
+</ion-content>
