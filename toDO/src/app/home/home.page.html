@@ -8,15 +8,15 @@
 
 <ion-content [fullscreen]="true">
 
-    <ion-item-sliding *ngFor="let msg of mensagens">
+    <ion-item-sliding *ngFor="let msg of mensagens; let i=index">
       <ion-item>
         <ion-label>{{msg.mensagem}}</ion-label>
         <ion-icon name="pricetag" slot="start"></ion-icon>
       </ion-item>
   
       <ion-item-options>
-        <ion-item-option color="tertiary"><ion-icon name="pencil"></ion-icon></ion-item-option>
-        <ion-item-option color="danger" (click)="apagar()"><ion-icon name="trash"></ion-icon></ion-item-option>
+        <ion-item-option color="tertiary" (click)="editar(i)" ><ion-icon name="pencil"></ion-icon></ion-item-option>
+        <ion-item-option color="danger" (click)="apagar(i)"><ion-icon name="trash"></ion-icon></ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
 

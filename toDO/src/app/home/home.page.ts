@@ -8,20 +8,20 @@ import { format } from 'path';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  constructor(private alertaControle: AlertController, private toast: ToastController ) {}
+  constructor(private alertaControle: AlertController, private toast: ToastController) { }
 
   mensagens = [
-    {mensagem: 'Comprar pão'},
-    {mensagem: 'Tomar banho'},
-    {mensagem: 'Escovar os dentes'}
+    { mensagem: 'Comprar pão' },
+    { mensagem: 'Tomar banho' },
+    { mensagem: 'Escovar os dentes' }
   ]
 
-  async adicionarTarefa(){
+  async adicionarTarefa() {
     const ALERTA = await this.alertaControle.create({
       header: 'Qual tarefa quer incluir?',
       inputs: [
         {
-          name:'tarefa' ,
+          name: 'tarefa',
           type: 'text',
           placeholder: 'Digite a tarefa'
         }
@@ -46,26 +46,25 @@ export class HomePage {
   }
 
   //* ----------- FUNÇÔES ----------------
-  //pode usar o async na frente da função para fazer o alert dentro da função "async exibirValorInput()"
-  async exibirValorInput(tarefaNova: string){
+  async exibirValorInput(tarefaNova: string) {
 
-    if(tarefaNova.trim().length < 1){
-      //this.exibirMensagem();
+    if (tarefaNova.trim().length < 1) {
+
       const TOAST = await this.toast.create({
         message: 'Você não digitou uma tarefa',
         duration: 2000,
         position: 'top',
         color: 'dark'
       });
-  
+
       TOAST.present();
 
-    }else{
-      this.mensagens.push({mensagem: tarefaNova});
+    } else {
+      this.mensagens.push({ mensagem: tarefaNova });
     }
   }
 
-  async apagar(){
+  async apagar(index: number) {
     const ALERTA = await this.alertaControle.create({
       header: 'Deseja realmente excluir?',
       buttons: [
@@ -78,10 +77,7 @@ export class HomePage {
         {
           text: 'Sim',
           handler: () => {
-            
-           // this.mensagens.splice(1);
-           // console.log(this.mensagens.indexOf({mensagem: "comprar"}));
-            this.mensagens.forEach( x => this.mensagens.splice(this.mensagens.indexOf(x)));
+            this.mensagens.splice(index, 1);
           }
         }
       ]
@@ -89,18 +85,40 @@ export class HomePage {
 
     ALERTA.present();
   }
-  ler(){
-    
-  }
 
- /* async exibirMensagem() {
-    const ALERT = await this.alertaControle.create({
-      header: 'Alerta',
-      subHeader: 'Campo vazio!',
-      message: 'Você não digitou uma tarefa',
-      buttons: ['OK'],
+  async editar(index: number){
+    const EDITAR = await this.alertaControle.create({
+      header: 'Qual a nova tarefa?',
+      inputs: [
+        {
+          name: 'tarefa',
+          type: 'text',
+          placeholder: 'Digite a tarefa'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          handler: () => {
+            console.log('cancelou');
+          }
+        },
+        {
+          text: 'Adicionar',
+          handler: (form) => {
+
+          let msg  = this.mensagens[index];
+          msg.mensagem = form.tarefa;
+
+          }
+        }
+      ]
     });
 
-    await ALERT.present();
-  }*/
+    EDITAR.present();
+  }
+
+  ler() {
+
+  }
 }
