@@ -7,16 +7,24 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <ion-searchbar animated="true"  color="light" ></ion-searchbar>
+  <p *ngIf="mensagens.length == 0" >Sem tarefas...</p>
 
-    <ion-item-sliding *ngFor="let msg of mensagens; let i=index">
+    <ion-item-sliding *ngFor="let msg of mensagens">
       <ion-item>
-        <ion-label>{{msg.mensagem}}</ion-label>
-        <ion-icon name="pricetag" slot="start"></ion-icon>
+        <ion-label *ngIf="msg.done == true"><del>{{msg.mensagem}}</del></ion-label>
+        <ion-label *ngIf="msg.done == false">{{msg.mensagem}}</ion-label>
+        <ion-icon name="radio-button-off" slot="start" *ngIf="msg.done == false" ></ion-icon>
+        <ion-icon name="radio-button-on" color="success" slot="start" *ngIf="msg.done == true"></ion-icon>
       </ion-item>
-  
+
+      <ion-item-options side="start">
+        <ion-item-option color="success" (click)="completar(msg)" ><ion-icon name="checkmark-outline"></ion-icon></ion-item-option>
+      </ion-item-options>
+
       <ion-item-options>
-        <ion-item-option color="tertiary" (click)="editar(i)" ><ion-icon name="pencil"></ion-icon></ion-item-option>
-        <ion-item-option color="danger" (click)="apagar(i)"><ion-icon name="trash"></ion-icon></ion-item-option>
+        <ion-item-option color="tertiary" (click)="editar(msg)" ><ion-icon name="pencil"></ion-icon></ion-item-option>
+        <ion-item-option color="danger" (click)="apagar(msg)"><ion-icon name="trash"></ion-icon></ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
 

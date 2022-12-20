@@ -8,35 +8,47 @@ import { format } from 'path';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  constructor(private alertaControle: AlertController, private toast: ToastController) { }
+  constructor(private alertaControle: AlertController, private toast: ToastController){ 
 
-  mensagens = [
-    { mensagem: 'Comprar pão' },
-    { mensagem: 'Tomar banho' },
-    { mensagem: 'Escovar os dentes' }
-  ]
+    this.lerLocalStorage();
+  }
+
+   mensagens = new Array();
+    
+
+  //  teste = [
+  //   {nome: 'teste'},
+  //   {nome: 'teste02'}
+  // ]
+
+  /*transformar(){
+    let json = '';
+    json = '[';
+
+    for(let i = 0; i < this.teste.length; i++){
+      
+      json = json + '{';
+      json = json + '"nome"';
+      json = json + ":";
+      json = json + this.teste[i].nome;
+      json = json + '},';
+
+    }
+    json = json + ']';
+    console.log(json);
+  }*/
+  
 
   async adicionarTarefa() {
     const ALERTA = await this.alertaControle.create({
       header: 'Qual tarefa quer incluir?',
       inputs: [
-        {
-          name: 'tarefa',
-          type: 'text',
-          placeholder: 'Digite a tarefa'
-        }
+        { name: 'tarefa', type: 'text', placeholder: 'Digite a tarefa'}
       ],
       buttons: [
-        {
-          text: 'Cancelar',
-          handler: () => {
-            console.log('cancelou');
-          }
-        },
-        {
-          text: 'Adicionar',
-          handler: (form) => {
-            this.exibirValorInput(form.tarefa);
+        { text: 'Cancelar', handler: () => { console.log('cancelou'); }},
+        { text: 'Adicionar', handler: (form) => {
+            this.adicionar(form.tarefa);
           }
         }
       ]
@@ -46,7 +58,7 @@ export class HomePage {
   }
 
   //* ----------- FUNÇÔES ----------------
-  async exibirValorInput(tarefaNova: string) {
+  async adicionar(tarefaNova: string) {
 
     if (tarefaNova.trim().length < 1) {
 
@@ -60,11 +72,12 @@ export class HomePage {
       TOAST.present();
 
     } else {
-      this.mensagens.push({ mensagem: tarefaNova });
+      this.mensagens.push({ mensagem: tarefaNova, done: false});
+      this.atualizarLocalStorage();
     }
   }
 
-  async apagar(index: number) {
+  async apagar(msg: any) {
     const ALERTA = await this.alertaControle.create({
       header: 'Deseja realmente excluir?',
       buttons: [
@@ -77,7 +90,16 @@ export class HomePage {
         {
           text: 'Sim',
           handler: () => {
-            this.mensagens.splice(index, 1);
+
+            for(let i = 0; i < this.mensagens.length ; i++ ){
+
+              if(msg.mensagem == this.mensagens[i].mensagem){
+
+              this.mensagens.splice(i, 1);              
+              }
+            }
+
+            this.atualizarLocalStorage();
           }
         }
       ]
@@ -86,29 +108,25 @@ export class HomePage {
     ALERTA.present();
   }
 
-  async editar(index: number){
+
+  completar(msg: any){
+
+     msg.done = !msg.done;
+    
+     this.atualizarLocalStorage();
+  }
+  
+  async editar(msg: any){
     const EDITAR = await this.alertaControle.create({
       header: 'Qual a nova tarefa?',
       inputs: [
-        {
-          name: 'tarefa',
-          type: 'text',
-          placeholder: 'Digite a tarefa'
-        }
+        { name: 'tarefa', type: 'text', placeholder: 'Digite a tarefa'}
       ],
       buttons: [
-        {
-          text: 'Cancelar',
-          handler: () => {
-            console.log('cancelou');
-          }
-        },
-        {
-          text: 'Adicionar',
-          handler: (form) => {
+        { text: 'Cancelar', handler: () => { console.log('cancelou'); }},
+        { text: 'Adicionar', handler: (form) => {
 
-          let msg  = this.mensagens[index];
-          msg.mensagem = form.tarefa;
+            this.testarEdicao(form.tarefa, msg);
 
           }
         }
@@ -118,7 +136,31 @@ export class HomePage {
     EDITAR.present();
   }
 
-  ler() {
+  async testarEdicao(tarefaNova: string, msg: any) {
 
+    if (tarefaNova.trim().length < 1) {
+
+      const TOAST = await this.toast.create({
+        message: 'Você não digitou uma tarefa',
+        duration: 2000,
+        position: 'top',
+        color: 'dark'
+      });
+
+      TOAST.present();
+
+    } else {
+      msg.mensagem = tarefaNova;
+      this.atualizarLocalStorage();
+    }
+  }
+
+  atualizarLocalStorage(){
+    localStorage.setItem("mensagemDB", JSON.stringify(this.mensagens));
+  }
+
+  lerLocalStorage(){
+    this.mensagens = JSON.parse(
+      localStorage.getItem('mensagemDB') || "[]");
   }
 }
