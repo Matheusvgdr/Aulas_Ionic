@@ -7,7 +7,8 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-searchbar animated="true"  color="light" ></ion-searchbar>
+  <ion-searchbar animated="true"  color="light" [(ngModel)]="searchBar" (keydown)="filtrar($event)" (keyup.backspace)="verificar()"  (ionClear)="limpar()"></ion-searchbar>
+
   <p *ngIf="mensagens.length == 0" >Sem tarefas...</p>
 
     <ion-item-sliding *ngFor="let msg of mensagens">

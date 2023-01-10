@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { AlertController, ToastController } from '@ionic/angular';
 import { format } from 'path';
 
@@ -8,13 +8,16 @@ import { format } from 'path';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  constructor(private alertaControle: AlertController, private toast: ToastController){ 
+  constructor(private alertaControle: AlertController, private toast: ToastController) {
 
     this.lerLocalStorage();
+
+
   }
 
-   mensagens = new Array();
-    
+
+  mensagens = new Array();
+  searchBar: string = "";
 
   //  teste = [
   //   {nome: 'teste'},
@@ -37,17 +40,17 @@ export class HomePage {
     json = json + ']';
     console.log(json);
   }*/
-  
 
   async adicionarTarefa() {
     const ALERTA = await this.alertaControle.create({
       header: 'Qual tarefa quer incluir?',
       inputs: [
-        { name: 'tarefa', type: 'text', placeholder: 'Digite a tarefa'}
+        { name: 'tarefa', type: 'text', placeholder: 'Digite a tarefa' }
       ],
       buttons: [
-        { text: 'Cancelar', handler: () => { console.log('cancelou'); }},
-        { text: 'Adicionar', handler: (form) => {
+        { text: 'Cancelar', handler: () => { console.log('cancelou'); } },
+        {
+          text: 'Adicionar', handler: (form) => {
             this.adicionar(form.tarefa);
           }
         }
@@ -72,7 +75,7 @@ export class HomePage {
       TOAST.present();
 
     } else {
-      this.mensagens.push({ mensagem: tarefaNova, done: false});
+      this.mensagens.push({ mensagem: tarefaNova, done: false });
       this.atualizarLocalStorage();
     }
   }
@@ -91,11 +94,11 @@ export class HomePage {
           text: 'Sim',
           handler: () => {
 
-            for(let i = 0; i < this.mensagens.length ; i++ ){
+            for (let i = 0; i < this.mensagens.length; i++) {
 
-              if(msg.mensagem == this.mensagens[i].mensagem){
+              if (msg.mensagem == this.mensagens[i].mensagem) {
 
-              this.mensagens.splice(i, 1);              
+                this.mensagens.splice(i, 1);
               }
             }
 
@@ -109,22 +112,23 @@ export class HomePage {
   }
 
 
-  completar(msg: any){
+  completar(msg: any) {
 
-     msg.done = !msg.done;
-    
-     this.atualizarLocalStorage();
+    msg.done = !msg.done;
+
+    this.atualizarLocalStorage();
   }
-  
-  async editar(msg: any){
+
+  async editar(msg: any) {
     const EDITAR = await this.alertaControle.create({
       header: 'Qual a nova tarefa?',
       inputs: [
-        { name: 'tarefa', type: 'text', placeholder: 'Digite a tarefa'}
+        { name: 'tarefa', type: 'text', placeholder: 'Digite a tarefa' }
       ],
       buttons: [
-        { text: 'Cancelar', handler: () => { console.log('cancelou'); }},
-        { text: 'Adicionar', handler: (form) => {
+        { text: 'Cancelar', handler: () => { console.log('cancelou'); } },
+        {
+          text: 'Adicionar', handler: (form) => {
 
             this.testarEdicao(form.tarefa, msg);
 
@@ -155,12 +159,34 @@ export class HomePage {
     }
   }
 
-  atualizarLocalStorage(){
+  atualizarLocalStorage() {
     localStorage.setItem("mensagemDB", JSON.stringify(this.mensagens));
   }
 
-  lerLocalStorage(){
+  lerLocalStorage() {
     this.mensagens = JSON.parse(
       localStorage.getItem('mensagemDB') || "[]");
+  }
+
+  filtrar(e: any) {
+    this.searchBar = e.target.value.toLowerCase();
+    this.mensagens = this.filtrarMsg(this.searchBar);
+    console.log("Acionando o filtro");
+  }
+
+  filtrarMsg(search: string) {
+    return this.mensagens.filter((i) => {
+        return i.mensagem.toLowerCase().includes(search.toLowerCase());    
+      
+    })
+  }
+
+  limpar(){
+   this.lerLocalStorage();
+  }
+
+  verificar(){
+    
+   this.limpar();
   }
 }
