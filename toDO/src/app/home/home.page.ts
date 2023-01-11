@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { AlertController, ToastController } from '@ionic/angular';
 import { format } from 'path';
+import { HomeService } from '../service/home.service';
 
 @Component({
   selector: 'app-home',
@@ -8,38 +9,13 @@ import { format } from 'path';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  constructor(private alertaControle: AlertController, private toast: ToastController) {
-
-    this.lerLocalStorage();
-
-
-  }
-
 
   mensagens = new Array();
   searchBar: string = "";
+  
+  constructor(private alertaControle: AlertController, private toast: ToastController, private servico: HomeService) {
 
-  //  teste = [
-  //   {nome: 'teste'},
-  //   {nome: 'teste02'}
-  // ]
-
-  /*transformar(){
-    let json = '';
-    json = '[';
-
-    for(let i = 0; i < this.teste.length; i++){
-      
-      json = json + '{';
-      json = json + '"nome"';
-      json = json + ":";
-      json = json + this.teste[i].nome;
-      json = json + '},';
-
-    }
-    json = json + ']';
-    console.log(json);
-  }*/
+  }
 
   async adicionarTarefa() {
     const ALERTA = await this.alertaControle.create({
@@ -60,6 +36,12 @@ export class HomePage {
     ALERTA.present();
   }
 
+  ngOnInit(){
+    this.servico.getListarTarefa().subscribe(x => this.mensagens = x);
+    console.log('Primeira execução : ');
+    console.log(this.mensagens);
+  }
+
   //* ----------- FUNÇÔES ----------------
   async adicionar(tarefaNova: string) {
 
@@ -75,8 +57,8 @@ export class HomePage {
       TOAST.present();
 
     } else {
+
       this.mensagens.push({ mensagem: tarefaNova, done: false });
-      this.atualizarLocalStorage();
     }
   }
 
@@ -102,7 +84,7 @@ export class HomePage {
               }
             }
 
-            this.atualizarLocalStorage();
+            //this.atualizarLocalStorage();
           }
         }
       ]
@@ -116,7 +98,7 @@ export class HomePage {
 
     msg.done = !msg.done;
 
-    this.atualizarLocalStorage();
+    //this.atualizarLocalStorage();
   }
 
   async editar(msg: any) {
@@ -155,23 +137,29 @@ export class HomePage {
 
     } else {
       msg.mensagem = tarefaNova;
-      this.atualizarLocalStorage();
     }
   }
 
-  atualizarLocalStorage() {
-    localStorage.setItem("mensagemDB", JSON.stringify(this.mensagens));
-  }
+  // atualizarLocalStorage() {
+  //   localStorage.setItem("mensagemDB", JSON.stringify(this.mensagens));
+  // }
 
-  lerLocalStorage() {
-    this.mensagens = JSON.parse(
-      localStorage.getItem('mensagemDB') || "[]");
-  }
+  // lerLocalStorage() {
+  //   this.mensagens = JSON.parse(
+  //     localStorage.getItem('mensagemDB') || "[]");
+  // }
 
   filtrar(e: any) {
-    this.searchBar = e.target.value.toLowerCase();
-    this.mensagens = this.filtrarMsg(this.searchBar);
-    console.log("Acionando o filtro");
+    this.prepararFiltro(e);
+    console.log(e);
+
+    if(e.code == "Backspace"){
+      this.servico.getListarTarefa().subscribe(x => this.mensagens = x);
+      this.prepararFiltro(e);
+      console.log('Execução após o filtro : ');
+      console.log(this.mensagens);
+    }
+
   }
 
   filtrarMsg(search: string) {
@@ -182,11 +170,12 @@ export class HomePage {
   }
 
   limpar(){
-   this.lerLocalStorage();
+   this.servico.getListarTarefa().subscribe(x => this.mensagens = x);
   }
 
-  verificar(){
-    
-   this.limpar();
+  prepararFiltro(e: any){
+    this.searchBar = e.target.value.toLowerCase();
+    this.mensagens = this.filtrarMsg(this.searchBar);
   }
+
 }
